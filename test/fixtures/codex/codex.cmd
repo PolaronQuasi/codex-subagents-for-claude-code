@@ -1,0 +1,2 @@
+@echo off
+"%CODEX_FIXTURE_NODE%" "%CODEX_FIXTURE_ENTRY%" %*

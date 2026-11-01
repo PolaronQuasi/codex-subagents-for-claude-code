@@ -1,0 +1,27 @@
+name: Bug report
+description: Report a reproducible problem with the runner or installer.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For vulnerabilities, use Security → Report a vulnerability; do not post details here.
+        Remove tokens, private prompts, usernames, paths and unrelated source from all output.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal commands in a disposable workspace, expected behavior and actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment and sanitized doctor output
+      description: OS, Node, runner, plugin and CLI versions; sanitized node run-codex-task.mjs --doctor --read-only output.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized logs
+      description: Include only the relevant error and safe reproduction output.

@@ -1,0 +1,15 @@
+{
+  "name": "codex-subagents-for-claude-code",
+  "owner": {
+    "name": "PolaronQuasi"
+  },
+  "description": "The codex-subagents plugin: GPT models as Claude Code subagents through the Codex CLI.",
+  "plugins": [
+    {
+      "name": "codex-subagents",
+      "source": "./",
+      "description": "Named GPT forwarder agents, the direct-use skill and the /codex-limits, /codex-list and /codex-doctor commands, run through the installed Codex CLI.",
+      "category": "development"
+    }
+  ]
+}

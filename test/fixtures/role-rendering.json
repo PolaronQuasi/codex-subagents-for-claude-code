@@ -1,0 +1,86 @@
+{
+  "ROLES": {
+    "gpt-6-1-sol": {
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "gpt-6-1-terra": {
+      "model": "gpt-6.1-terra",
+      "effort": "xhigh"
+    },
+    "gpt-6-astra": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "gpt-6-sol": {
+      "model": "gpt-6-sol",
+      "effort": "xhigh"
+    },
+    "gpt-6-luna": {
+      "model": "gpt-6-luna",
+      "effort": "xhigh"
+    },
+    "gpt-5-6-sol": {
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh"
+    },
+    "gpt-5-6-terra": {
+      "model": "gpt-5.6-terra",
+      "effort": "xhigh"
+    },
+    "gpt-5-6-luna": {
+      "model": "gpt-5.6-luna",
+      "effort": "xhigh"
+    }
+  },
+  "DISPLAY": {
+    "gpt-6-1-sol": {
+      "model": "GPT-6.1-Sol",
+      "alias": "(\"6.1 sol\")"
+    },
+    "gpt-6-1-terra": {
+      "model": "GPT-6.1-Terra",
+      "alias": "(\"6.1 terra\")"
+    },
+    "gpt-6-astra": {
+      "model": "GPT-6 Astra",
+      "alias": "(\"6.0 astra\", \"astra\")"
+    },
+    "gpt-6-sol": {
+      "model": "GPT-6-Sol",
+      "alias": "(\"6.0 sol\", \"6 sol\")"
+    },
+    "gpt-6-luna": {
+      "model": "GPT-6-Luna",
+      "alias": "(\"6.0 luna\", \"6 luna\")"
+    },
+    "gpt-5-6-sol": {
+      "model": "GPT-5.6-Sol",
+      "alias": "(\"5.6 sol\")"
+    },
+    "gpt-5-6-terra": {
+      "model": "GPT-5.6-Terra",
+      "alias": "(\"5.6 terra\", \"terra\")"
+    },
+    "gpt-5-6-luna": {
+      "model": "GPT-5.6-Luna",
+      "alias": "(\"5.6 luna\")"
+    }
+  },
+  "paths": {
+    "runner": "R/run-codex-task.mjs",
+    "manual": "R/docs/MANUAL.md",
+    "tmp": "T"
+  },
+  "sha256": {
+    "gpt-6-1-sol.md": "179b8a26fe0457a3c2e94cddba3e555b8a60b7d908deb591f515550980f5774a",
+    "gpt-6-1-terra.md": "88849fe263e994c07f28f3e758ece23f2b183bba49df9f22cecf1a8e6f9e92a1",
+    "gpt-6-astra.md": "327575ba91ef1915fcbbaa53992580db6d8eb1f297132c627f1cdafe4c4633c7",
+    "gpt-6-sol.md": "8d1ad5c5a27cea73d82fbba04825f3eb192d829acf5c3a993801c3d54ac9e3ec",
+    "gpt-6-luna.md": "a6a1c51b4a013ef8f362ffef3f05c9bf639817089bbe32ed3c7f232456c2aaee",
+    "gpt-5-6-sol.md": "1655f7478d78929b64e33dfe595bd49bb88c7e27958cf158a9a9413e4c52f471",
+    "gpt-5-6-terra.md": "d1db10f84db330d5242b8349b3f2a93cec97502adc35b76d5c56a7e9071c8235",
+    "gpt-5-6-luna.md": "a6b527ec7ddcc8979bd89607fac33657ed71f5e00bbb8d8349d19f8183fd0f2f",
+    "SKILL.md": "d2737e7182a614fc4541c277dadf6fc804299d316e3e07276f799930f9a9125e"
+  }
+}

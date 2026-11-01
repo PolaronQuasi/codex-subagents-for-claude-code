@@ -1,0 +1,14 @@
+#!/bin/sh
+# The gates, then the suite (a few minutes). Both run on the working tree, so
+# release.mjs pre-push first refuses unless every pushed commit is HEAD (or one
+# the remote already has) and the files check reads equal HEAD's: what is
+# checked and tested is then what is pushed. It reads git's ref lines on stdin.
+git diff --check || exit 1
+git diff --cached --check || exit 1
+node tools/release.mjs pre-push "$@" || exit 1
+# Hooks run with GIT_DIR set (an absolute path in a linked worktree). The tests make their own
+# repositories, so they must not inherit it or any other GIT_ variable. The agent-folder overrides
+# are not needed: the check renders its own temporary definitions.
+for name in $(env | sed -n 's/^\(GIT_[A-Za-z0-9_]*\)=.*/\1/p'); do unset "$name"; done
+unset CODEX_SUBAGENTS_FOR_CLAUDE_CODE_AGENTS_DIR CODEX_SUBAGENTS_FOR_CLAUDE_CODE_SKILL_DIR
+exec node tools/test-files.mjs run

@@ -1,0 +1,29 @@
+---
+title: One owned driver and app-server per turn
+---
+flowchart TB
+  accTitle: Codex subagents for Claude Code architecture
+  accDescr: Claude Code forwarders or a terminal pass a task file to the waiter. Each turn has one detached driver and one dedicated Codex CLI app-server. Authenticated IPC carries control, while private files hold prompts, bounded progress and immutable results. The CLI uses native login to reach the remote model service. Separate verification compares actual checkout bytes against an in-memory baseline of a complete sealed-commit checkout, removes settled snapshots when identity is proven, and retains logs.
+
+  INPUT["Claude Code forwarder or terminal<br/>Self-contained file or bounded stdin"] --> WAITER["Foreground runner / waiter<br/>Validate · launch · recover · deliver"]
+  BATCH["Explicit multi-model batch<br/>Pinned commit, independent children"] --> WAITER
+  VERIFY["Separate trusted-local verification<br/>Complete sealed-commit checkout<br/>Pre-command in-memory baseline<br/>Bounded process group / Job Object"] -->|"evidence only, no model"| RESULT
+  RESULT -->|"sealed artifact"| VERIFY
+  WAITER -->|"owned launch; authenticated control"| DRIVER["Detached driver<br/>One job / turn · HMAC IPC"]
+  DRIVER -->|"optional explicit compact, then task or review"| CODEX["Dedicated Codex CLI app-server<br/>Bounded JSONL · native login"]
+  WAITER -. "run record and locks" .-> STATE[("Private run state<br/>Prompts · steer reservations<br/>Progress · diff · immutable result")]
+  DRIVER -. "job checkpoints and output" .-> STATE
+  WAITER -. "save before printing" .-> RESULT[("Durable result files<br/>Answer + optional JSON · ownership receipts")]
+  HISTORY["Explicit thread maintenance<br/>Owned short-lived probe app-server<br/>No model turn"] -->|"read / fork / revert / archive"| THREADS[("Codex thread history<br/>Named threads · persisted turns")]
+  HISTORY -. "explicit sensitive local ZIP" .-> BUNDLE[("Diagnostic bundle<br/>No upload · fresh destination")]
+  CODEX -. "persist conversation" .-> THREADS
+  HISTORY -. "verify root-bound ownership" .-> RESULT
+  CODEX -. "read; edit when authorized" .-> WORK["Local workspace<br/>Existing folder, worktree or scratch"]
+  CODEX <-->|"model request / response"| MODEL["REMOTE: OpenAI model service<br/>Requested model and effort<br/>Observed reroutes disclosed"]
+
+  classDef primary fill:#eaf2ff,stroke:#3864a2,color:#142b49,stroke-width:2px;
+  classDef store fill:#e7f5ef,stroke:#35745d,color:#163c2f,stroke-width:1.5px;
+  classDef external fill:#f1ecfa,stroke:#7d60ad,color:#382650,stroke-width:2px;
+  class WAITER,DRIVER,CODEX,HISTORY primary;
+  class STATE,RESULT,WORK,THREADS,BUNDLE store;
+  class MODEL external;

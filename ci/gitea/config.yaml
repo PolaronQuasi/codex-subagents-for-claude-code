@@ -1,0 +1,22 @@
+log:
+  level: info
+  job:
+    dir: /data/job-logs
+    retention: 168h
+    max_size: 32MB
+runner:
+  file: /data/.runner
+  capacity: 1
+  timeout: 30m
+  shutdown_timeout: 30m
+  tool_cache_mode: shared
+  envs:
+    RUNNER_TOOL_CACHE: /opt/hostedtoolcache
+    AGENT_TOOLSDIRECTORY: /opt/hostedtoolcache
+    NPM_CONFIG_CACHE: /home/node/.cache/npm
+  labels:
+    - codex-subagents-for-claude-code-linux:host
+cache:
+  enabled: false
+host:
+  workdir_parent: /data/workspaces

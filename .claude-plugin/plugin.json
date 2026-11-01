@@ -1,0 +1,21 @@
+{
+  "name": "codex-subagents",
+  "displayName": "Codex subagents for Claude Code",
+  "version": "1.0.0",
+  "description": "Delegate Claude Code tasks to GPT through Codex CLI, with saved results and resumable runs. Needs Node.js 22+, Git and a logged-in compatible CLI. Tested with codex-cli 0.166.0; other versions are admitted subject to capabilities.",
+  "author": {
+    "name": "PolaronQuasi"
+  },
+  "homepage": "https://github.com/PolaronQuasi/codex-subagents-for-claude-code/",
+  "repository": "https://github.com/PolaronQuasi/codex-subagents-for-claude-code.git",
+  "license": "Apache-2.0",
+  "keywords": [
+    "claude-code",
+    "claude-code-subagents",
+    "openai-codex",
+    "codex-cli",
+    "gpt-subagent",
+    "multi-model",
+    "ai-agents"
+  ]
+}

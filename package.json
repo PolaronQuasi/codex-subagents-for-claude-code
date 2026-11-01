@@ -1,0 +1,46 @@
+{
+  "name": "codex-subagents-for-claude-code",
+  "version": "1.0.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "Delegate tasks from Claude Code through the Codex CLI with native threads, managed worktrees, multi-model batches and durable results.",
+  "keywords": [
+    "claude-code",
+    "claude-code-subagents",
+    "claude-code-skill",
+    "openai-codex",
+    "codex-cli",
+    "code-review",
+    "gpt-subagent",
+    "multi-model",
+    "git-worktree",
+    "task-delegation",
+    "ai-agents"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node tools/release.mjs check",
+    "test": "node tools/test-files.mjs run",
+    "ci": "node tools/ci.mjs",
+    "format": "npx --yes prettier@3.9.9 --write --ignore-unknown .",
+    "format:check": "npx --yes prettier@3.9.9 --check --ignore-unknown .",
+    "package-release": "node tools/distribution.mjs build",
+    "smoke-release": "node tools/distribution.mjs smoke",
+    "contract": "node tools/codex.contract.mjs",
+    "verify": "node tools/release.mjs verify",
+    "install-agents": "node install.mjs",
+    "release": "node tools/release.mjs",
+    "setup": "node tools/release.mjs setup"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PolaronQuasi/codex-subagents-for-claude-code.git"
+  },
+  "homepage": "https://github.com/PolaronQuasi/codex-subagents-for-claude-code/",
+  "bugs": {
+    "url": "https://github.com/PolaronQuasi/codex-subagents-for-claude-code/issues"
+  }
+}

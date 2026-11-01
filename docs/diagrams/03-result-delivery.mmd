@@ -1,0 +1,43 @@
+---
+title: Preserve the answer before shortening or cleaning up
+---
+sequenceDiagram
+  accTitle: Ordered result delivery and retention
+  accDescr: The driver publishes final text before immutable terminal metadata. The waiter caches the answer and normally confirms shutdown before snapshotting and delivering it. An unknown descendant tree permits delivery of the saved answer with an uncertainty warning, while state, claims and deferred finalization remain. Other shutdown failures retain state. Console limits require a durable copy. Explicit forced close can accept an unknown tree only after fresh identity checks and mandatory durable evidence.
+  participant Job as Driver / job store
+  participant Runner as Waiter
+  participant Cache as Private run state
+  participant Copy as Durable result
+  participant Caller as Caller / terminal
+
+  Note over Job: Publish final.txt before immutable turn.json
+  Runner->>Job: Read terminal result
+  Job-->>Runner: Answer + status + accounting
+  Runner->>Cache: Cache full answer and checksum
+  Runner->>Job: Stop owned processes and confirm descendants ended
+  break Descendant tree is unknown
+    Runner->>Copy: Save answer with confirmed=no, keep=yes
+    Runner-->>Caller: Saved answer + --close KEY --force recovery command
+    Note over Runner,Cache: Keep state and claims.<br/>Defer workspace snapshot.<br/>No continuation.<br/>No automatic cleanup.
+  end
+  break Other shutdown failure
+    Runner->>Cache: Retain answer and locks, no publication
+  end
+  Runner->>Cache: Record dormancy
+  Note over Runner,Cache: Commit worktree changes.<br/>Derive cumulative paths and diff.<br/>Scratch inventories files.<br/>Shared checkout uses protocol paths.<br/>Record missing-patch diagnostics.
+  opt Output schema selected and final text parses as JSON
+    Runner->>Copy: Save JSON sidecar before delivery acknowledgement
+  end
+  Runner->>Copy: Save complete answer + runner footer
+  alt Durable copy saved
+    Copy-->>Runner: Saved file path
+    Runner->>Cache: Record durable-save milestone
+    Runner-->>Caller: Answer, optional limits, unchanged footer + path<br/>Add quota / reroute / schema / tier / compaction metadata
+  else Copy could not be written
+    Copy-->>Runner: Storage error
+    Runner-->>Caller: Full answer + warning + keep=yes
+    Note over Runner,Cache: Keep cached answer and run.<br/>A collector requiring a copy<br/>stops before printing.
+  end
+  Caller-->>Runner: Console output accepted
+  Runner->>Cache: Record delivery acknowledgement
+  Note over Runner,Cache: Release writer lock.<br/>Keep run or attempt cleanup.<br/>A changed delivered worktree<br/>refuses close.<br/>Cleanup archives the thread.<br/>Archive failure keeps<br/>a retry receipt.

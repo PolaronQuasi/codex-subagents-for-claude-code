@@ -1,0 +1,44 @@
+---
+title: A turn outlives its waiter; continuation starts a new driver
+---
+flowchart TB
+  accTitle: Run and turn lifecycle
+  accDescr: A validated task launches an owned driver and app-server. Wait timeout leaves work active; attach collects it and steer adds guidance to the same turn. Terminal output is preserved, processes normally stop, then the final snapshot is delivered. An unknown descendant tree allows answer collection while retaining claims and deferring finalization. Explicit forced close can accept that uncertainty only after fresh identity checks and durable evidence. Known survivors still block. A sleeping finalized turn can continue without a redundant role.
+
+  TASK["Task or native review + policies<br/>Optional request ID"] --> LAUNCH["Record job and driver identity<br/>Start/resume and name thread"]
+  LAUNCH --> COMPACT{"Continuation requests<br/>explicit compact?"}
+  DISPATCH["Dispatch task or review once"] --> ACTIVE["Active turn<br/>Bounded progress and latest diff"]
+  ACTIVE -->|"wait budget ends"| ATTACH["Return run key; exit 3<br/>Work continues"]
+  ATTACH -->|"--run KEY"| ACTIVE
+  STEER["--steer KEY + prompt file"] -->|"authenticated; same turn"| ACTIVE
+  ACTIVE -->|"terminal evidence"| DELIVER["Cache result, stop owned processes<br/>Commit final snapshot, then deliver"]
+  DELIVER -->|"unknown descendant tree"| UNKNOWN["Deliver saved answer with warning<br/>Retain state and claims<br/>Defer workspace finalization"]
+  UNKNOWN -->|"--close KEY --force"| FORCE["Fresh identity-bound stop attempt<br/>Known survivors block<br/>Never signal an unproved PID"]
+  FORCE -->|"uncertainty explicitly accepted"| EVIDENCE["Mandatory durable acceptance receipt<br/>Mark saved results; warn about PIDs<br/>Evidence failure retains state"]
+  EVIDENCE --> DONE
+  DELIVER --> KEEP{"Keep requested<br/>or durable copy failed?"}
+  KEEP -->|"yes"| IDLE["Retained run and thread<br/>No idle driver by default"]
+  KEEP -->|"no"| CLOSE["Close run after safe shutdown"]
+  IDLE -->|"--continue KEY + new task, unless sealed"| LAUNCH
+  COMPACT -->|"yes: extra model call"| SUMMARY["Record summary intent<br/>Wait for confirmed compaction<br/>Uncertainty retains the run"]
+  SUMMARY -->|"confirmed"| DISPATCH
+  SUMMARY -->|"not confirmed: prompt withheld"| DELIVER
+  COMPACT -->|"no"| DISPATCH
+  IDLE -->|"--fork KEY"| FORK["New retained context<br/>Fresh worktree and run lock<br/>No model turn until --continue"]
+  FORK -->|"first task"| LAUNCH
+  IDLE -->|"--revert KEY --before-turn N"| REVERT["Replace conversation prefix<br/>Files and local answers remain<br/>No uncertain mutation retry"]
+  IDLE -->|"--finalize KEY"| SEALED["Seal exact artifact<br/>No further continuation"]
+  SEALED -->|"--close KEY"| CLOSE
+  IDLE -->|"--close KEY"| CLOSE
+  IDLE -->|"--transcript KEY"| HISTORY["Read bounded persisted history<br/>No model turn; retained run stays"]
+  CLOSE -->|"local cleanup succeeds"| DONE["Attempt owned-thread archive<br/>Release claims; remove temporary state<br/>Durable evidence and committed branch remain"]
+  DONE -. "archive failed" .-> ORPHAN["Keep ownership receipt + warning<br/>Explicit orphan retry; never delete history"]
+  CLOSE -->|"failure"| RETRY["Retain evidence and report retry"]
+  RETRY -->|"retry close"| CLOSE
+
+  classDef decision fill:#fff5dc,stroke:#b58a25,color:#483a18,stroke-width:1.5px;
+  classDef retained fill:#e7f5ef,stroke:#35745d,color:#163c2f,stroke-width:1.5px;
+  classDef finished fill:#f1ecfa,stroke:#7d60ad,color:#382650,stroke-width:1.5px;
+  class KEEP,COMPACT decision;
+  class ATTACH,IDLE,RETRY,UNKNOWN,EVIDENCE retained;
+  class DONE finished;

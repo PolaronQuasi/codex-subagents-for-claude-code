@@ -1,0 +1,47 @@
+name: codex-subagents-for-claude-code-ci
+
+services:
+  runner:
+    build: .
+    image: codex-subagents-for-claude-code-gitea-runner:5.2.3
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 31m
+    cpus: 2
+    mem_limit: 4g
+    pids_limit: 512
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    environment:
+      GITEA_INSTANCE_URL: ${GITEA_INSTANCE_URL:?Set the container-accessible Gitea URL in .env}
+      GITEA_RUNNER_NAME: ${GITEA_RUNNER_NAME:-codex-subagents-for-claude-code-docker}
+    volumes:
+      - registration:/data
+      - cache:/home/node/.cache
+      - tools:/opt/hostedtoolcache
+    networks:
+      - gitea
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "const HEALTH_TIMEOUT_MS = 5000; const EXIT = { SUCCESS: 0, FAILURE: 1 }; fetch(process.env.GITEA_INSTANCE_URL + '/api/v1/version', {signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS)}).then(r => process.exit(r.ok ? EXIT.SUCCESS : EXIT.FAILURE)).catch(() => process.exit(EXIT.FAILURE))",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+volumes:
+  registration:
+  cache:
+  tools:
+
+networks:
+  gitea:
+    # Jobs share this network; prefer one that holds only Gitea's web container (RELEASING.md).
+    external: true
+    name: ${GITEA_DOCKER_NETWORK:?Set the existing Gitea network in .env}
