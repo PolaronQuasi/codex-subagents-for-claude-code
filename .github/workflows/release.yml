@@ -1,0 +1,59 @@
+name: Draft release
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.server_url == 'https://github.com'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate the triggering tag and exact commit
+        shell: bash
+        env:
+          RELEASE_REF: ${{ github.ref }}
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          readonly EXIT_FAILURE=1
+          [[ "$RELEASE_REF" =~ ^refs/tags/v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || { echo 'Expected a version tag'; exit "$EXIT_FAILURE"; }
+          test "$(git rev-parse "$RELEASE_REF^{commit}")" = "$RELEASE_SHA"
+          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+          git merge-base --is-ancestor "$RELEASE_SHA" refs/remotes/origin/main
+          echo "RELEASE_TAG=${RELEASE_REF#refs/tags/}" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Check formatting
+        run: npm run format:check
+      - name: Check and test tagged source
+        run: node tools/ci.mjs
+      - name: Install the supported Codex schema generator
+        run: npm install --global @openai/codex@0.166.0
+      - name: Check the generated protocol and fake driver
+        run: npm run contract
+      - name: Package the tag and test both downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/distribution.mjs build "$RELEASE_TAG" release-artifacts
+          node tools/distribution.mjs smoke release-artifacts
+      - name: Create and verify a new draft
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/publish-github.mjs release-artifacts

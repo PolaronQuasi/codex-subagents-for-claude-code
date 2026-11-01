@@ -1,0 +1,17 @@
+name: Feature request
+description: Propose a focused improvement.
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Problem and use case
+      description: Describe the task you cannot complete and your current workaround.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior and alternatives
+      description: Include implications for process ownership, private state or write permission.
+    validations:
+      required: true

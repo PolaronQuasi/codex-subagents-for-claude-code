@@ -1,0 +1,40 @@
+---
+title: Resolve uncertainty from evidence; never resend a possibly sent prompt
+---
+flowchart TB
+  accTitle: Safe driver and submission recovery
+  accDescr: Immutable terminal output wins. Otherwise recovery must prove the driver, app-server and captured descendants ended. Incomplete shutdown retries the recorded identities without signaling an unproved PID. A definitely unsent launch may retry once. A possibly sent turn is looked up by client ID and never resent. Unique completed history is adopted; missing or ambiguous evidence stays uncertain. Steering observations and history can settle acceptance without resending. Batch children require exact digest ownership. Uncertain children are never resent; proof of no live process frees capacity for unaffected planned children, while possible-live children retain their slots.
+
+  CHECK["Inspect the recorded job"] --> TERMINAL{"Immutable terminal<br/>result already present?"}
+  TERMINAL -->|"yes"| DELIVER["Preserve answer, confirm shutdown<br/>Snapshot then deliver"]
+  DELIVER -->|"unknown descendant tree"| SAVED["Deliver saved answer with warning<br/>Keep state and claims; defer snapshot"]
+  SAVED -->|"explicit --close KEY --force"| FORCE["Fresh identity-bound checks<br/>Known survivors still block<br/>Save acceptance evidence before cleanup"]
+  TERMINAL -->|"no"| ENDED{"Driver, app-server and captured<br/>descendants proved ended?"}
+  STOP["Incomplete shutdown<br/>Recheck captured identities<br/>Never signal an unproved PID"] --> ENDED
+  ENDED -->|"no or unknown"| RETAIN["Retain state and locks<br/>No automatic stop or resend"]
+  ENDED -->|"yes"| SENT{"Definitely unsent?"}
+  SENT -->|"yes: pre-dispatch evidence"| RETRY["Allow one startup retry"]
+  SENT -->|"possibly sent"| HISTORY["Page history: task by client ID<br/>Review by proven outer turn ID only<br/>Never repeat turn/start or review/start"]
+  HISTORY --> MATCH{"One matching<br/>completed result?"}
+  MATCH -->|"yes"| ADOPT["Publish recovered answer<br/>without replacing an existing terminal"]
+  ADOPT --> DELIVER
+  MATCH -->|"no"| FAILED["Retain failure / uncertainty evidence<br/>Interrupted history is not cancellation"]
+  STEER["Uncertain steer acknowledgement"] --> OBSERVED{"Matching observation<br/>or unique history item?"}
+  OBSERVED -->|"yes"| ACCEPT["Settle accepted<br/>No turn/steer resend"]
+  OBSERVED -->|"no"| UNCERTAIN["Keep steer uncertain<br/>No turn/steer resend"]
+  BATCH["Uncertain batch child launch<br/>Never resend this child"] --> LIVE{"Request evidence proves<br/>no live child process?"}
+  LIVE -->|"yes"| PLANNED["Keep child uncertain; release its slot<br/>Unaffected planned children may progress<br/>Never resend the uncertain child"]
+  LIVE -->|"no or unknown"| OWNER{"Recorded child identity and<br/>exact request digest match?"}
+  OWNER -->|"no"| SLOT["Retain possible-live slot<br/>No collection or cancellation<br/>Preserve evidence"]
+  OWNER -->|"yes"| COLLECT["Collect existing child only<br/>Keep slot until settled<br/>Never launch this child again"]
+  VERIFY["Repeated verification attempt"] --> REPLAY["Replay completed evidence<br/>Incomplete receipt becomes uncertain<br/>Never rerun the same attempt"]
+  MUTATION["Uncertain fork, compact or revert"] --> CHECKPOINT["Keep durable intent and owned-process identity<br/>No automatic mutation retry"]
+  CHECKPOINT -->|"revert only: exact saved prefix proven"| RECONCILE["Record confirmed history edit<br/>Never resend thread/revert"]
+  CHECKPOINT -->|"no proof"| RETAIN
+
+  classDef decision fill:#fff5dc,stroke:#b58a25,color:#483a18,stroke-width:1.5px;
+  classDef safe fill:#e7f5ef,stroke:#35745d,color:#163c2f,stroke-width:1.5px;
+  classDef stop fill:#fdeeed,stroke:#b35a53,color:#632d28,stroke-width:1.5px;
+  class TERMINAL,ENDED,SENT,MATCH,OBSERVED,OWNER,LIVE decision;
+  class DELIVER,RETRY,ADOPT,ACCEPT,REPLAY,PLANNED,COLLECT,SAVED,FORCE safe;
+  class RETAIN,FAILED,UNCERTAIN,SLOT stop;

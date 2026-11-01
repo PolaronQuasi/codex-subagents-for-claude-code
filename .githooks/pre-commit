@@ -1,0 +1,10 @@
+#!/bin/sh
+# The cheap gates on what is being committed: whitespace in both diffs, then
+# check. check reads the working tree, so release.mjs pre-commit first refuses
+# while a file check reads has unstaged changes or is untracked: what check
+# judges is then what the commit records. It reads the index git gives this
+# hook (GIT_INDEX_FILE, a temporary one for git commit -a or a commit of named
+# paths); check's own children run without any GIT_ variable.
+git diff --check || exit 1
+git diff --cached --check || exit 1
+exec node tools/release.mjs pre-commit

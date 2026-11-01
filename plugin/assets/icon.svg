@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>Codex subagents</title>
+  <rect width="64" height="64" rx="14" fill="#152B3C"/>
+  <path d="M32 24V32M16 40V32H48V40" stroke="#8DDBD2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="22" y="9" width="20" height="16" rx="5" fill="#8DDBD2"/>
+  <path d="M29 14L26 17L29 20M35 14L38 17L35 20" stroke="#152B3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="8" y="40" width="16" height="15" rx="4" fill="#F3B982"/>
+  <rect x="40" y="40" width="16" height="15" rx="4" fill="#8DDBD2"/>
+  <path d="M13 47H19M45 47H51" stroke="#152B3C" stroke-width="2" stroke-linecap="round"/>
+</svg>

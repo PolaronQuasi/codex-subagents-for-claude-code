@@ -1,0 +1,14 @@
+# Run output and local copies kept beside the sources, not versioned.
+results/
+backups/
+node_modules/
+docs/local/sleep-server.log
+# A runner staged by tools/release.mjs, gone once the rename succeeds.
+*.next.mjs
+# The installed releases and the pointer that selects one: machine state,
+# recreated by node tools/release.mjs install.
+dist/
+# Portable publication artifacts, regenerated from a version tag.
+release-artifacts/
+# Local Docker runner connection settings.
+ci/gitea/.env
