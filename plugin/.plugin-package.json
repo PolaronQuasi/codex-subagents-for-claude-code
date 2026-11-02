@@ -301,8 +301,8 @@
     },
     {
       "path": "src/maintenance/verification.mjs",
-      "size": 13645,
-      "sha256": "9f2ceea04e9331b6cad0fc810f21b07628c94d8d1ba17a7ca1d5a82acc2c14ea"
+      "size": 13663,
+      "sha256": "e7bc3d8ebdc9ec7be6956782975c613d2706350df073589df5bb9308994b20a9"
     },
     {
       "path": "src/roles.mjs",
@@ -546,8 +546,8 @@
     },
     {
       "path": "src/verification/files.mjs",
-      "size": 5963,
-      "sha256": "b76b06340985dae941e165b1da8d95104830a28f78acb5f275f3b90094694465"
+      "size": 6245,
+      "sha256": "13306f373822f69a2c502bba52924a3c9950749cc789b09b31064a8806c55bf7"
     },
     {
       "path": "src/verification/posix-worker.mjs",

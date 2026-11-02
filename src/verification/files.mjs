@@ -14,7 +14,9 @@ import {
 } from "../shared/constants.mjs";
 
 export async function snapshotFiles(root) {
-  const rootStat = fs.lstatSync(root);
+  // Keep IDs exact throughout capture and comparison; rounded Numbers can
+  // make a replacement file or directory appear to be the original on NTFS.
+  const rootStat = fs.lstatSync(root, { bigint: true });
   if (!rootStat.isDirectory() || rootStat.isSymbolicLink())
     throw new Error("verification snapshot root is not a regular directory");
   const files = new Map();
@@ -38,11 +40,11 @@ export async function snapshotFiles(root) {
       bounded();
       const name = relative ? relative + "/" + entry.name : entry.name;
       const file = path.join(root, name),
-        stat = fs.lstatSync(file);
+        stat = fs.lstatSync(file, { bigint: true });
       if (
         stat.isSymbolicLink() ||
         (!stat.isFile() && !stat.isDirectory()) ||
-        (stat.isFile() && stat.nlink !== 1)
+        (stat.isFile() && stat.nlink !== 1n)
       ) {
         files.set(name, { type: "unsafe" });
       } else if (stat.isDirectory()) {
@@ -50,10 +52,10 @@ export async function snapshotFiles(root) {
       } else {
         const hash = crypto.createHash("sha256");
         const fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
-        const opened = fs.fstatSync(fd);
+        const opened = fs.fstatSync(fd, { bigint: true });
         if (
           !opened.isFile() ||
-          opened.nlink !== 1 ||
+          opened.nlink !== 1n ||
           opened.dev !== stat.dev ||
           opened.ino !== stat.ino
         ) {
@@ -65,18 +67,18 @@ export async function snapshotFiles(root) {
           bounded();
           hash.update(chunk);
         }
-        const after = fs.lstatSync(file);
+        const after = fs.lstatSync(file, { bigint: true });
         if (
           after.dev !== stat.dev ||
           after.ino !== stat.ino ||
           after.size !== stat.size ||
-          after.mtimeMs !== stat.mtimeMs
+          after.mtimeNs !== stat.mtimeNs
         )
           throw new Error("verification file changed during comparison");
         files.set(name, {
           type: "file",
           sha256: hash.digest("hex"),
-          executable: !IS_WINDOWS && Boolean(stat.mode & 0o111),
+          executable: !IS_WINDOWS && Boolean(stat.mode & 0o111n),
         });
       }
     }
@@ -109,8 +111,8 @@ export function compareSnapshotFiles(before, after) {
 }
 
 function controlFile(file) {
-  const stat = fs.lstatSync(file);
-  if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1)
+  const stat = fs.lstatSync(file, { bigint: true });
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1n)
     throw new Error("verification Git control file is unsafe");
   return {
     file,
@@ -129,7 +131,7 @@ export function snapshotControl(root, common, commit) {
   const directory = fs.realpathSync.native(path.resolve(root, match[1]));
   if (!sameFolder(path.dirname(directory), path.join(common, "worktrees")))
     throw new Error("verification Git metadata is outside the artifact repository");
-  const stat = fs.lstatSync(directory);
+  const stat = fs.lstatSync(directory, { bigint: true });
   if (!stat.isDirectory() || stat.isSymbolicLink())
     throw new Error("verification Git metadata directory is unsafe");
   const head = controlFile(path.join(directory, "HEAD"));
@@ -146,7 +148,7 @@ export function snapshotControl(root, common, commit) {
 
 export function unchangedControl(control) {
   try {
-    const stat = fs.lstatSync(control.directory);
+    const stat = fs.lstatSync(control.directory, { bigint: true });
     if (
       !stat.isDirectory() ||
       stat.isSymbolicLink() ||
