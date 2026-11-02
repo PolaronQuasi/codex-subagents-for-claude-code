@@ -98,8 +98,8 @@ export function fixture(t, initial = {}) {
       !["running", "queued"].includes(config.status) &&
       !config.hangTurn
     )
-      // These scenarios require a completed fake turn, not an eight-second host speed.
-      copy[index + 1] = "30000";
+      // These scenarios assert completed results, not hosted runner speed.
+      copy[index + 1] = "60000";
     return copy;
   };
   const invoke = async (args = LAUNCH, options = {}) => {

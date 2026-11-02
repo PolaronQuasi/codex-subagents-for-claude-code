@@ -4,9 +4,14 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import test from "node:test";
 import { workspace } from "./support/workspace-fixture.mjs";
-import { VERIFY_DISPATCH_MS, VERIFY_START_PHASE } from "../src/shared/constants.mjs";
+import {
+  VERIFY_DISPATCH_MS,
+  VERIFY_WINDOWS_STARTUP_MS,
+  VERIFY_POLL_MS,
+  VERIFY_START_PHASE,
+} from "../src/shared/constants.mjs";
 
-// Load the unchanged executor with fake POSIX process/clock adapters. This
+// Load the unchanged executor with fake process/clock adapters. This
 // covers the boundary deterministically on Windows too, without starting or
 // signalling any process. Only import specifiers in the copied module change.
 async function executor(t, { windows = false } = {}) {
@@ -40,7 +45,8 @@ export const IS_LINUX = false;
 const { EventEmitter } = await import("node:events");
 const { PassThrough } = await import("node:stream");
 const fs = (await import("node:fs")).default;
-export const state = { now: 1000, child: null, onTerminal: null, delivered: false, kills: 0, phase: null };
+const crypto = await import("node:crypto");
+export const state = { now: 1000, child: null, onTerminal: null, delivered: false, kills: 0, phase: null, startupMs: null, authorized: 0 };
 export const processStart = () => "owned-fake-start";
 export const leadsProcessGroup = () => true;
 export const POWERSHELL = "unused";
@@ -54,6 +60,10 @@ export function spawn(_command, args) {
     unref() {},
   });
   state.child = child;
+  state.spawnedAt = state.now;
+  state.key = "";
+  child.stdin.on("data", chunk => { state.key += chunk.toString(); });
+  state.files = Object.fromEntries(["Recipe", "Ready", "Go", "Cancel", "Report", "Phase"].map(name => [name, args[args.indexOf("-" + name) + 1]]));
   if (state.phase !== null) fs.writeFileSync(args[args.indexOf("-Phase") + 1], state.phase);
   return child;
 }
@@ -63,6 +73,22 @@ export function spawnSync(command) {
 }
 export async function setTimeout(ms) {
   state.now += ms;
+  if (state.startupMs !== null && !state.delivered && state.now - state.spawnedAt >= state.startupMs) {
+    if (!fs.existsSync(state.files.Ready)) {
+      fs.writeFileSync(state.files.Ready, JSON.stringify({ pid: 900000002, processStart: "owned-fake-command" }));
+    }
+    const cancelled = fs.existsSync(state.files.Cancel);
+    const authorized = fs.existsSync(state.files.Go);
+    if (cancelled || authorized) {
+      if (authorized) state.authorized++;
+      const payload = Buffer.from(JSON.stringify({ state: cancelled ? "cancelled" : "exited", code: 0, settled: true, durationMs: ms })).toString("base64");
+      const proof = crypto.createHmac("sha256", Buffer.from(state.key.trim(), "base64")).update(payload).digest("hex");
+      fs.writeFileSync(state.files.Report, JSON.stringify({ payload, proof }));
+      state.delivered = true;
+      state.child.emit("exit", 0, null);
+      state.child.emit("close");
+    }
+  }
   if (state.child?.started && !state.delivered) {
     state.delivered = true;
     state.child.emit("message", { kind: "exit", code: 0, signal: null });
@@ -91,10 +117,55 @@ export function kill(pid, signal) {
     run: (timeoutMs, signal) =>
       executeVerification(
         { executable: process.execPath, args: [], env: {}, timeoutMs, maxLogBytes: 128 },
-        { directory: f.state, cwd: f.work, signal, checkpoint() {} },
+        {
+          directory: f.state,
+          cwd: f.work,
+          signal,
+          checkpoint: (value) => fake.state.onCheckpoint?.(value),
+        },
       ),
   };
 }
+
+test("Windows slow supervisor startup preserves the command's execution budget", async (t) => {
+  const f = await executor(t, { windows: true });
+  f.state.phase = VERIFY_START_PHASE.COMPILING;
+  f.state.startupMs = VERIFY_DISPATCH_MS + 5000;
+  const result = await f.run(1000);
+  assert.equal(result.state, "exited", JSON.stringify(result));
+  assert.equal(result.code, 0);
+  assert.equal(result.settled, true);
+  assert.equal(f.state.authorized, 1);
+  assert.equal(f.state.kills, 0);
+});
+
+test("Windows cancellation during slow startup settles without authorizing the command", async (t) => {
+  const f = await executor(t, { windows: true });
+  const controller = new AbortController();
+  f.state.phase = VERIFY_START_PHASE.COMPILING;
+  f.state.startupMs = VERIFY_DISPATCH_MS + 5000;
+  f.state.onCheckpoint = () => controller.abort();
+  const result = await f.run(1000, controller.signal);
+  assert.equal(result.state, "cancelled", JSON.stringify(result));
+  assert.equal(result.settled, true);
+  assert.equal(f.state.authorized, 0);
+  assert.equal(fs.existsSync(path.join(f.directory, "go")), false);
+  assert.equal(f.state.kills, 0);
+});
+
+test("Windows readiness after the startup deadline never authorizes the command", async (t) => {
+  const f = await executor(t, { windows: true });
+  f.state.phase = VERIFY_START_PHASE.READY;
+  f.state.startupMs = VERIFY_WINDOWS_STARTUP_MS + VERIFY_POLL_MS;
+  const result = await f.run(1000);
+  assert.equal(result.state, "uncertain", JSON.stringify(result));
+  assert.equal(result.settled, false);
+  assert.match(result.error, /verification dispatch timed out/);
+  assert.equal(fs.existsSync(path.join(f.directory, "ready.json")), true);
+  assert.equal(fs.existsSync(path.join(f.directory, "go")), false);
+  assert.equal(f.state.authorized, 0);
+  assert.equal(f.state.kills, 1);
+});
 
 for (const phase of [VERIFY_START_PHASE.COMPILING, "secret recipe text", null]) {
   test(`Windows startup diagnostics retain uncertainty for phase ${phase === null ? "missing" : phase === VERIFY_START_PHASE.COMPILING ? "compiling" : "invalid"}`, async (t) => {
@@ -106,7 +177,7 @@ for (const phase of [VERIFY_START_PHASE.COMPILING, "secret recipe text", null]) 
     assert.equal(result.state, "uncertain");
     assert.equal(result.settled, false);
     assert.equal(result.error, `verification dispatch timed out (supervisor phase: ${expected})`);
-    assert.ok(result.durationMs > VERIFY_DISPATCH_MS);
+    assert.ok(result.durationMs > VERIFY_WINDOWS_STARTUP_MS);
     assert.equal(fs.existsSync(path.join(f.directory, "go")), false);
     assert.equal(f.state.kills, 1, "only the owned fake supervisor is stopped");
     assert.doesNotMatch(JSON.stringify(result), /secret recipe text/);

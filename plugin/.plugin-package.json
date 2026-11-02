@@ -101,8 +101,8 @@
     },
     {
       "path": "docs/OPERATIONS.md",
-      "size": 12812,
-      "sha256": "c48114871532bd113535410b899b070f005802c5777ea4df04f8993d3c48dc8d"
+      "size": 13190,
+      "sha256": "bbaac1c2e5b17e34447db61be359cc539bb89b8548ce8212892f862617915f7a"
     },
     {
       "path": "run-codex-task.mjs",
@@ -371,8 +371,8 @@
     },
     {
       "path": "src/shared/constants.mjs",
-      "size": 38455,
-      "sha256": "6e0c7408db8d2f947cc5c33e2c778a6a4609c120c4c043d1213fafae1d151790"
+      "size": 38658,
+      "sha256": "ffd0f1a1e464d50de42c685b136e7c3223475f2707a90b45b9c77335654c7c51"
     },
     {
       "path": "src/shared/errors.mjs",
@@ -556,8 +556,8 @@
     },
     {
       "path": "src/verification/process.mjs",
-      "size": 14312,
-      "sha256": "4c2cc5b9c5f2ec8361b040255f6a7c88698e81c1fead9f07c66181750f57f2b9"
+      "size": 14504,
+      "sha256": "a63742006406e159885641a4c30af44e8ec0246a332246866ae12decbb40750a"
     },
     {
       "path": "src/verification/windows-job.mjs",

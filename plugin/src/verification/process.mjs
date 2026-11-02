@@ -5,7 +5,7 @@ import {
   PROCESS_GROUP_QUERY_MS,
   VERIFY_IDENTITY_ATTEMPTS,
   VERIFY_IDENTITY_PAUSE_MS,
-  VERIFY_DISPATCH_MS,
+  VERIFY_WINDOWS_STARTUP_MS,
   VERIFY_START_PHASE,
   VERIFY_METADATA_BYTES,
   VERIFY_STOP_MS,
@@ -243,10 +243,14 @@ export async function executeVerification(recipe, { directory, cwd, signal, chec
       if (!termination) child.send({ kind: VERIFY_IPC.START, ...recipe, cwd, env });
     }
     let authorized = false;
-    const dispatchLimit = performance.now() + VERIFY_DISPATCH_MS;
+    const startupDeadline = performance.now() + VERIFY_WINDOWS_STARTUP_MS;
     let executionStart = IS_WINDOWS ? null : performance.now();
     for (;;) {
       if (cancellationError) throw cancellationError;
+      // Check before accepting readiness: a delayed poll must never authorize
+      // a command after the supervisor's startup allowance has expired.
+      if (executionStart === null && performance.now() > startupDeadline)
+        throw new Error("verification dispatch timed out");
       if (IS_WINDOWS && !authorized && fs.existsSync(ready)) {
         const owned = JSON.parse(readLimited(ready, VERIFY_METADATA_BYTES).toString("utf8"));
         if (
@@ -318,11 +322,10 @@ export async function executeVerification(recipe, { directory, cwd, signal, chec
       if (!IS_WINDOWS && (terminal || termination)) break;
       if (exited && !IS_WINDOWS)
         throw new Error("verification supervisor exited before settlement");
-      if (executionStart === null && performance.now() > dispatchLimit)
-        throw new Error("verification dispatch timed out");
       if (
         termination &&
-        performance.now() - (executionStart ?? started) > recipe.timeoutMs + VERIFY_STOP_MS
+        executionStart !== null &&
+        performance.now() - executionStart > recipe.timeoutMs + VERIFY_STOP_MS
       )
         throw new Error("verification process stop timed out");
       await delay(VERIFY_POLL_MS);
