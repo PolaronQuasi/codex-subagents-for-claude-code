@@ -5,11 +5,14 @@ import { pathToFileURL } from "node:url";
 import test from "node:test";
 import { workspace } from "./support/workspace-fixture.mjs";
 import {
-  VERIFY_DISPATCH_MS,
   VERIFY_WINDOWS_STARTUP_MS,
   VERIFY_POLL_MS,
   VERIFY_START_PHASE,
 } from "../src/shared/constants.mjs";
+
+// Hosted Windows has exceeded a minute on its first helper compilation.
+// Keep this independent of the runtime limit so a smaller allowance regresses.
+const SLOW_WINDOWS_STARTUP_MS = 75000;
 
 // Load the unchanged executor with fake process/clock adapters. This
 // covers the boundary deterministically on Windows too, without starting or
@@ -130,7 +133,7 @@ export function kill(pid, signal) {
 test("Windows slow supervisor startup preserves the command's execution budget", async (t) => {
   const f = await executor(t, { windows: true });
   f.state.phase = VERIFY_START_PHASE.COMPILING;
-  f.state.startupMs = VERIFY_DISPATCH_MS + 5000;
+  f.state.startupMs = SLOW_WINDOWS_STARTUP_MS;
   const result = await f.run(1000);
   assert.equal(result.state, "exited", JSON.stringify(result));
   assert.equal(result.code, 0);
@@ -143,7 +146,7 @@ test("Windows cancellation during slow startup settles without authorizing the c
   const f = await executor(t, { windows: true });
   const controller = new AbortController();
   f.state.phase = VERIFY_START_PHASE.COMPILING;
-  f.state.startupMs = VERIFY_DISPATCH_MS + 5000;
+  f.state.startupMs = SLOW_WINDOWS_STARTUP_MS;
   f.state.onCheckpoint = () => controller.abort();
   const result = await f.run(1000, controller.signal);
   assert.equal(result.state, "cancelled", JSON.stringify(result));

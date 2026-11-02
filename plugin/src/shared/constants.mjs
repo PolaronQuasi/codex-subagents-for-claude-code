@@ -863,7 +863,7 @@ export const VERIFY_IDENTITY_PAUSE_MS = 20;
 export const VERIFY_DISPATCH_MS = 15000;
 // Cold Windows PowerShell/C# startup is separate from command authorization
 // and the recipe's execution budget. A stalled supervisor still has a bound.
-export const VERIFY_WINDOWS_STARTUP_MS = 60000;
+export const VERIFY_WINDOWS_STARTUP_MS = 120000;
 export const VERIFY_WINDOWS_FLAGS = Object.freeze({
   JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE: 0x2000,
   STARTF_USESTDHANDLES: 0x100,
