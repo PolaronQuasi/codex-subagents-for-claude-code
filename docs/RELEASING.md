@@ -14,10 +14,15 @@ permissions. Only the release job has `contents: write`. The publisher explicitl
 `GITHUB_TOKEN`; checkout also uses the job token, with credential persistence disabled.
 No personal token, Docker runner or Gitea secret is required.
 
+The matrix pins Ubuntu 26.04, Windows Server 2025 and macOS 26; the release job also uses
+Ubuntu 26.04. These labels keep OS-generation upgrades explicit, while GitHub continues
+updating each image's patches and installed tools. macOS uses the standard Arm64 runner;
+Ubuntu and Windows use x64 runners.
+
 The destination is [PolaronQuasi/codex-subagents-for-claude-code](https://github.com/PolaronQuasi/codex-subagents-for-claude-code).
 Follow the [publication checklist](GITHUB-SETUP.md) to verify CODEOWNERS, branch/tag protection,
-Actions access and private vulnerability reporting. The repository is initially private; check
-Actions billing and permissions before running hosted jobs. Local tests do not establish a successful GitHub-hosted run.
+Actions access and private vulnerability reporting. The repository is public and uses standard
+GitHub-hosted runners. Local tests do not establish a successful GitHub-hosted run.
 
 ## Prepare and publish
 
@@ -28,8 +33,10 @@ Actions billing and permissions before running hosted jobs. Local tests do not e
    `npm run check-plugin` to rebuild and verify the generated payload. Run `npm run format:check`
    and `npm run ci`. The format scripts fetch pinned Prettier with `npx`; CI renders disposable
    checkout definitions and checks the committed plugin payload without rebuilding it.
-   Review and stage the maintained and generated changes. Commit and push `main`, then wait for all six **Source checks** jobs
-   to pass. Use the [isolated contributor setup](DEVELOPMENT.md#isolated-contributor-setup)
+   Review and stage the maintained and generated changes. Commit to a feature branch and open a
+   pull request against `main`. Wait for all six **Source checks** jobs to pass, resolve review
+   conversations and keep the branch up to date, then squash-merge the pull request.
+   Use the [isolated contributor setup](DEVELOPMENT.md#isolated-contributor-setup)
    for commit and push hooks; never skip the hooks.
 3. For a source release, fetch `origin`, confirm the tested commit is on `origin/main`,
    and check out that exact commit with a clean working tree. Confirm the version tag does
