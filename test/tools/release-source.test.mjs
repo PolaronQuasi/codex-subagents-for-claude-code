@@ -356,8 +356,10 @@ test("install copies a checkout's tracked files only and never writes a file .gi
     fs.mkdirSync(path.join(dir, "ci", "gitea"), { recursive: true });
     fs.writeFileSync(path.join(dir, "ci", "gitea", "compose.yml"), "services: {}\n");
     fs.writeFileSync(path.join(dir, "ci", "gitea", ".env"), "GITEA_RUNNER_TOKEN=copy\n");
-    fs.mkdirSync(path.join(dir, "docs", "history", "mcp-probe"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "docs", "history", "mcp-probe", "sleep-server.log"), "a log\n");
+    fs.mkdirSync(path.join(dir, "docs", "local", "nested"), { recursive: true });
+    fs.writeFileSync(path.join(dir, "docs", "local", "runner.log"), "a log\n");
+    fs.writeFileSync(path.join(dir, "docs", "local", "notes.md"), "local notes\n");
+    fs.writeFileSync(path.join(dir, "docs", "local", "nested", "evidence.md"), "local evidence\n");
     fs.writeFileSync(path.join(dir, "src", "leftover.next.mjs"), "export const staged = 1;\n");
   };
   // A live folder whose ci/gitea/.env holds this machine's settings.
@@ -367,14 +369,26 @@ test("install copies a checkout's tracked files only and never writes a file .gi
     fs.writeFileSync(path.join(dir, "ci", "gitea", ".env"), localEnv);
     return dir;
   };
-  const installed = (target, ...names) =>
+  const present = (target, ...names) =>
     names.filter((name) => fs.existsSync(path.join(target, name)));
-  const ignored = ["docs/local/sleep-server.log", "src/leftover.next.mjs"];
+  const ignored = [
+    "docs/local/runner.log",
+    "docs/local/notes.md",
+    "docs/local/nested/evidence.md",
+    "src/leftover.next.mjs",
+  ];
   // A checkout: its ignored files are untracked, so it is clean and they are no sources.
   const checkout = path.join(root, "checkout");
   prepare(checkout);
+  assert.deepEqual(present(checkout, ...ignored), ignored, "every excluded input exists");
   initRepository(checkout, IDENTITY);
   gitIn(checkout, "add", "-A");
+  const tracked = gitIn(checkout, "ls-files", "-z").split("\0");
+  assert.deepEqual(
+    ignored.filter((name) => tracked.includes(name)),
+    [],
+    "local files stay untracked",
+  );
   gitIn(checkout, "commit", "-q", "-m", "fixture");
   assert.equal(gitIn(checkout, "status", "--porcelain"), "");
   const fromCheckout = live("live-checkout");
@@ -385,7 +399,7 @@ test("install copies a checkout's tracked files only and never writes a file .gi
     fs.readFileSync(path.join(fromCheckout, "ci", "gitea", "compose.yml"), "utf8"),
     "services: {}\n",
   );
-  assert.deepEqual(installed(fromCheckout, ...ignored), []);
+  assert.deepEqual(present(fromCheckout, ...ignored), []);
   const release = path.join(fromCheckout, "dist", readPointer(fromCheckout), "src");
   assert.equal(fs.existsSync(path.join(release, "leftover.next.mjs")), false);
   // Tracked by mistake (added by force), the copy's .env still never replaces the target's.
@@ -398,10 +412,12 @@ test("install copies a checkout's tracked files only and never writes a file .gi
   // A copy without git: the files its .gitignore excludes stay behind.
   const copy = path.join(root, "copy");
   prepare(copy);
+  assert.deepEqual(present(copy, ...ignored), ignored, "every excluded archive-copy input exists");
   const fromCopy = live("live-copy");
   assert.equal(install({ fromDir: copy, target: fromCopy, env, write() {} }), 0);
   assert.equal(envFile(fromCopy), localEnv);
-  assert.deepEqual(installed(fromCopy, ...ignored), []);
+  assert.deepEqual(present(fromCopy, ...ignored), []);
+  assert.deepEqual(present(copy, ...ignored), ignored, "ignored source files are preserved");
   assert.equal(fs.existsSync(path.join(fromCopy, "ci", "gitea", "compose.yml")), true);
 });
 
@@ -434,8 +450,9 @@ test("the .gitignore reader of copies without git agrees with git check-ignore",
     "results/a.md",
     "x/results/a.md",
     "node_modules/p/index.js",
-    "docs/local/sleep-server.log",
+    "docs/local/runner.log",
     "docs/local/other.md",
+    "docs/local/nested/evidence.md",
     "src/run.next.mjs",
     "dist/current",
     "ci/gitea/.env",
@@ -486,6 +503,8 @@ test("the .gitignore reader of copies without git agrees with git check-ignore",
     names.filter((name) => byGit.has(name)),
   );
   assert.ok(byGit.has("ci/gitea/.env") && byGit.size > 10, [...byGit].join(" "));
+  for (const name of names.filter((name) => name.startsWith("docs/local/")))
+    assert.ok(byGit.has(name), `local diagnostic file must be ignored: ${name}`);
 });
 
 test("no file this repository tracks is one its .gitignore excludes, so install never leaves a release file behind", (t) => {

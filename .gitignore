@@ -2,7 +2,8 @@
 results/
 backups/
 node_modules/
-docs/local/sleep-server.log
+# Local notes and diagnostic evidence are never source files.
+docs/local/
 # A runner staged by tools/release.mjs, gone once the rename succeeds.
 *.next.mjs
 # The installed releases and the pointer that selects one: machine state,
