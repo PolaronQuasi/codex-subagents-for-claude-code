@@ -7,7 +7,8 @@ import { applyDirectives } from "../src/cli/task-input.mjs";
 import { loadOutputSchema } from "../src/shared/output-schema.mjs";
 import { fixture, LAUNCH } from "./support/codex-fixture.mjs";
 
-const args = [...LAUNCH.slice(0, -2), "--wait-ms", "10000", "--keep-state", "--keep-prompt"];
+// Schema assertions need a completed fake turn, independently of runner speed.
+const args = [...LAUNCH.slice(0, -2), "--wait-ms", "60000", "--keep-state", "--keep-prompt"];
 const starts = (f) => f.events().filter((e) => e.direction === "in" && e.method === "turn/start");
 const schema = {
   type: "object",
@@ -42,7 +43,7 @@ test("schema reaches the wire, survives source deletion, writes durable JSON and
   fs.writeFileSync(file, JSON.stringify(schema));
   const launch = [...args, "--output-schema", file, "--request-id", "schema-first"];
   const first = await f.invoke(launch);
-  assert.equal(first.code, 0, first.stderr);
+  assert.equal(first.code, 0, first.stderr + "\n" + first.stdout);
   assert.deepEqual(starts(f)[0].params.outputSchema, schema);
   const key = f.runs()[0];
   const record = () => JSON.parse(fs.readFileSync(path.join(f.state, key, "run.json")));
@@ -61,9 +62,9 @@ test("schema reaches the wire, survives source deletion, writes durable JSON and
     "prompt.md",
     "--keep-prompt",
     "--wait-ms",
-    "10000",
+    "60000",
   ]);
-  assert.equal(second.code, 0, second.stderr);
+  assert.equal(second.code, 0, second.stderr + "\n" + second.stdout);
   assert.equal(Object.hasOwn(starts(f)[1].params, "outputSchema"), false);
   assert.equal(record().turns[0].outputSchema.type, "object");
 });

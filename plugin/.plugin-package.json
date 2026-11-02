@@ -101,8 +101,8 @@
     },
     {
       "path": "docs/OPERATIONS.md",
-      "size": 12812,
-      "sha256": "c48114871532bd113535410b899b070f005802c5777ea4df04f8993d3c48dc8d"
+      "size": 13191,
+      "sha256": "d21c6b54262c21116e5ccc8b7611059cafba317b53ea39e85388d661243e5cd9"
     },
     {
       "path": "run-codex-task.mjs",
@@ -301,8 +301,8 @@
     },
     {
       "path": "src/maintenance/verification.mjs",
-      "size": 13645,
-      "sha256": "9f2ceea04e9331b6cad0fc810f21b07628c94d8d1ba17a7ca1d5a82acc2c14ea"
+      "size": 13663,
+      "sha256": "e7bc3d8ebdc9ec7be6956782975c613d2706350df073589df5bb9308994b20a9"
     },
     {
       "path": "src/roles.mjs",
@@ -371,8 +371,8 @@
     },
     {
       "path": "src/shared/constants.mjs",
-      "size": 38455,
-      "sha256": "6e0c7408db8d2f947cc5c33e2c778a6a4609c120c4c043d1213fafae1d151790"
+      "size": 38659,
+      "sha256": "9ff543244a980c9e4806e4995fe9d02c4f9d3a8408542e24bd8ad934041ac598"
     },
     {
       "path": "src/shared/errors.mjs",
@@ -546,8 +546,8 @@
     },
     {
       "path": "src/verification/files.mjs",
-      "size": 5963,
-      "sha256": "b76b06340985dae941e165b1da8d95104830a28f78acb5f275f3b90094694465"
+      "size": 6245,
+      "sha256": "13306f373822f69a2c502bba52924a3c9950749cc789b09b31064a8806c55bf7"
     },
     {
       "path": "src/verification/posix-worker.mjs",
@@ -556,8 +556,8 @@
     },
     {
       "path": "src/verification/process.mjs",
-      "size": 14312,
-      "sha256": "4c2cc5b9c5f2ec8361b040255f6a7c88698e81c1fead9f07c66181750f57f2b9"
+      "size": 14504,
+      "sha256": "a63742006406e159885641a4c30af44e8ec0246a332246866ae12decbb40750a"
     },
     {
       "path": "src/verification/windows-job.mjs",

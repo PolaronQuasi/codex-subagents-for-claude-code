@@ -326,7 +326,7 @@ export async function verifyArtifact(options, context) {
     if (receipt.snapshot && control && (!executionStarted || receipt.execution?.settled)) {
       try {
         if (!unchangedControl(control)) throw new Error("snapshot Git identity changed");
-        const root = fs.lstatSync(receipt.snapshot);
+        const root = fs.lstatSync(receipt.snapshot, { bigint: true });
         if (
           !baseline ||
           !root.isDirectory() ||

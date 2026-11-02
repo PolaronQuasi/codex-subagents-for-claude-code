@@ -50,3 +50,35 @@ test("scratch cleanup refuses a substituted symlink or junction without followin
   assert.throws(() => scratch.remove(), /unexpected temporary path or identity/);
   assert.equal(fs.readFileSync(path.join(other, "keep"), "utf8"), "unrelated");
 });
+
+for (const changedIdentity of ["directory", "parent"]) {
+  test(`scratch cleanup distinguishes large ${changedIdentity} identities that round to the same number`, (t) => {
+    const root = parent(t);
+    const base = fs.realpathSync.native(root);
+    const prefix = "codex-subagents-for-claude-code-check-";
+    const first = 2n ** 53n;
+    const replacement = first + 1n;
+    assert.equal(Number(first), Number(replacement), "numeric stats lose this distinction");
+    let replaced = false;
+    const lstat = fs.lstatSync;
+    t.mock.method(fs, "lstatSync", (file, options) => {
+      const stat = lstat(file, options);
+      const directory = path.dirname(file) === base && path.basename(file).startsWith(prefix);
+      if (file !== base && !directory) return stat;
+      const changed = changedIdentity === "directory" ? directory : file === base;
+      const ino = changed && replaced ? replacement : first;
+      return Object.assign(Object.create(Object.getPrototypeOf(stat)), stat, {
+        ino: options?.bigint ? ino : Number(ino),
+      });
+    });
+    const scratch = createScratch(prefix, root);
+    const original = `${scratch.directory}-original`;
+    fs.renameSync(scratch.directory, original);
+    fs.mkdirSync(scratch.directory);
+    fs.writeFileSync(path.join(scratch.directory, "keep"), "replacement");
+    replaced = true;
+    assert.throws(() => scratch.remove(), /unexpected temporary path or identity/);
+    assert.equal(fs.readFileSync(path.join(scratch.directory, "keep"), "utf8"), "replacement");
+    assert.ok(fs.existsSync(original));
+  });
+}

@@ -15,7 +15,9 @@ import { writeModelCache, readModelCache } from "../src/state/model-cache.mjs";
 import { readTurn } from "../src/state/job-store.mjs";
 import { until } from "./support/driver-evidence.mjs";
 
-const launch = [...LAUNCH.slice(0, -2), "--wait-ms", "8000"];
+// These assertions need a terminal result, not a foreground-wait timeout.
+// Windows process checks can consume eight seconds before the fake finishes.
+const launch = [...LAUNCH.slice(0, -2), "--wait-ms", "60000"];
 const RETIRES = Math.floor(Date.UTC(2026, 11, 1) / 1000);
 const model = (id, efforts, extra = {}) => ({
   id,
@@ -226,12 +228,13 @@ test("a failed model/list proves nothing and the launch goes on; a retirement is
 test("cached model and effort refusals refresh, allowing catalogue additions during the day", async (t) => {
   for (const stale of [model("other", ALL), model("gpt-6.1-sol", ["low"])]) {
     const f = fixture(t, { models: [model("gpt-6.1-sol", ALL)] });
-    assert.equal((await f.invoke([...launch, "--keep-prompt"])).code, 0);
+    const initial = await f.invoke([...launch, "--keep-prompt"]);
+    assert.equal(initial.code, 0, `${initial.stderr}\n${initial.stdout}`);
     const file = path.join(f.state, "models.json");
     const cache = JSON.parse(fs.readFileSync(file, "utf8"));
     fs.writeFileSync(file, JSON.stringify({ ...cache, models: [catalogModel(stale)] }));
     const done = await f.invoke(launch);
-    assert.equal(done.code, 0, done.stderr);
+    assert.equal(done.code, 0, `${done.stderr}\n${done.stdout}`);
     assert.equal(sent(f, "model/list").length, 2);
     assert.equal(sent(f, "turn/start").length, 2);
     assert.deepEqual(JSON.parse(fs.readFileSync(file, "utf8")).models[0].efforts, ALL);

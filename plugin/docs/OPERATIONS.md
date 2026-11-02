@@ -142,6 +142,11 @@ or a cleanup failure retains the snapshot. Read the receipt's cleanup reason bef
 repeating an attempt reads its receipt and never executes it again. See
 [artifact verification](MANUAL.md#separate-artifact-verification).
 
+Windows verification allows up to two minutes for supervisor startup, including compilation of its
+process-control helper. The recipe's execution timeout starts when the command is authorized;
+cancelling during startup prevents authorization and waits within that startup allowance for
+confirmed settlement. A startup timeout remains uncertain, never a successful verification.
+
 Windows verification errors include the last observed supervisor phase, such as `compiling` or
 `waiting-authorization`. This bounded diagnostic in `supervisor-phase.txt` helps locate startup
 failures; it is not proof that a command ran or that its processes stopped. An uncertain receipt

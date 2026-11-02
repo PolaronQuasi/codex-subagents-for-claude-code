@@ -12,11 +12,11 @@ jobs:
   check:
     if: github.server_url == 'https://github.com'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: ${{ matrix.os == 'windows-latest' && 90 || 30 }}
+    timeout-minutes: ${{ startsWith(matrix.os, 'windows-') && 90 || 30 }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-26.04, windows-2025, macos-26]
         node: [22, 24]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

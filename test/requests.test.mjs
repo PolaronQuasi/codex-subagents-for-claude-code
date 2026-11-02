@@ -853,8 +853,11 @@ test("a request claim is released with its run, and a stale empty claim is recla
   assert.equal(reclaimed.code, EXIT.COMPLETED, reclaimed.stderr);
   fs.mkdirSync(path.join(f.state, "requests", "fresh.lock"), { recursive: true });
   fs.writeFileSync(path.join(f.work, "prompt.md"), "again");
-  const blocked = await f.invoke([...LAUNCH, "--request-id", "fresh"]);
-  // A claim still being written is a launcher still starting: waited for, here with no budget.
+  // This checks a pending launcher, not a completed turn. Use an explicit short
+  // budget so the fixture's completion wait cannot let the fresh claim expire.
+  const blockedArgs = [...LAUNCH, "--request-id", "fresh"];
+  blockedArgs[blockedArgs.indexOf("--wait-ms") + 1] = "1";
+  const blocked = await f.invoke(blockedArgs);
   assert.equal(blocked.code, EXIT.STILL_RUNNING, blocked.stderr);
   assert.match(
     blocked.stdout,

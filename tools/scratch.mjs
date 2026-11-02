@@ -11,13 +11,14 @@ export function createScratch(prefix, parent = os.tmpdir()) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*-$/.test(prefix)) throw new Error("invalid scratch prefix");
   const base = fs.realpathSync.native(parent);
   const directory = fs.mkdtempSync(path.join(base, prefix));
-  const identity = fs.lstatSync(directory);
-  const parentIdentity = fs.lstatSync(base);
+  // Filesystem IDs can exceed Number's exact integer range, notably on NTFS.
+  const identity = fs.lstatSync(directory, { bigint: true });
+  const parentIdentity = fs.lstatSync(base, { bigint: true });
   return {
     directory,
     remove() {
-      const current = fs.lstatSync(directory);
-      const currentParent = fs.lstatSync(base);
+      const current = fs.lstatSync(directory, { bigint: true });
+      const currentParent = fs.lstatSync(base, { bigint: true });
       if (
         path.dirname(directory) !== base ||
         !path.basename(directory).startsWith(prefix) ||

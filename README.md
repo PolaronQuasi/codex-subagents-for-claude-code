@@ -67,8 +67,7 @@ claude plugin marketplace add https://github.com/PolaronQuasi/codex-subagents-fo
 claude plugin install codex-subagents@codex-subagents-for-claude-code
 ```
 
-While the repository is private, these commands require an account with repository access and
-GitHub authentication for Git. Inside a session, use `/plugin marketplace add` with the same clone URL, then
+Inside a session, use `/plugin marketplace add` with the same clone URL, then
 `/plugin install codex-subagents@codex-subagents-for-claude-code`.
 Restart Claude Code or run `/reload-plugins`. Plugin agents are namespaced, so ask for
 `codex-subagents:gpt-6-1-sol` (the role names are unchanged); the skill is
