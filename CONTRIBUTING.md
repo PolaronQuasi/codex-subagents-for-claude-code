@@ -27,6 +27,7 @@ Current sources of truth:
 | CLI surface and task syntax             | `src/cli/options.mjs`, `src/cli/task-input.mjs`, [manual](docs/MANUAL.md) |
 | Upstream integration assumptions        | [CONTRACT.md](CONTRACT.md), `src/codex/`, `tools/codex.contract.mjs`      |
 | Known limitations                       | [Security](SECURITY.md), [operations](docs/OPERATIONS.md)                 |
+| GitHub repository maintenance           | [Setup and release checklist](docs/GITHUB-SETUP.md)                       |
 | Public hosting and discoverability work | [Publishing guide](docs/PUBLISHING.md)                                    |
 
 Use the repository's pull-request review workflow. Do not include local task results, rollout

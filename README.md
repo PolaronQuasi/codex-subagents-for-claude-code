@@ -2,7 +2,6 @@
 
 Independent project; not affiliated with or endorsed by OpenAI or Anthropic.
 Source: [PolaronQuasi/codex-subagents-for-claude-code](https://github.com/PolaronQuasi/codex-subagents-for-claude-code).
-See the [GitHub publication checklist](docs/GITHUB-SETUP.md) for repository setup and release verification.
 
 Delegate self-contained tasks from Claude Code to GPT models through the installed Codex CLI.
 `run-codex-task.mjs` (runner 1.0.0) starts our own driver and a dedicated Codex app-server for each turn.

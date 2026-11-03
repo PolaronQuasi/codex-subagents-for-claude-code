@@ -5,25 +5,22 @@ find and use it.
 
 The project uses [Apache-2.0](../LICENSE), with attribution in [NOTICE](../NOTICE).
 The repository is [PolaronQuasi/codex-subagents-for-claude-code](https://github.com/PolaronQuasi/codex-subagents-for-claude-code).
-No separate documentation host, search-indexing record or adoption
-baseline is established. A private repository cannot be discovered by anonymous search crawlers.
+The repository is public. No separate documentation host, search-indexing record or adoption
+baseline is established.
 
-Use the [GitHub publication checklist](GITHUB-SETUP.md) to verify repository access,
-hosted CI and a private maintainer reporting route. Only the owner decides whether to make the
-repository public; public-access checks follow that explicit visibility change.
+Use the [GitHub maintenance checklist](GITHUB-SETUP.md) to verify repository settings,
+hosted CI and private vulnerability reporting.
 
 ## Confirm public access before announcing
 
 The README, package metadata, plugin and support pages use the confirmed GitHub repository.
-Verify anonymous access after the owner makes it public. Ordinary reports use its issue tracker;
+Verify that documentation and installation links work without login. Ordinary reports use its issue tracker;
 sensitive reports follow [SECURITY.md](../SECURITY.md#compatibility-and-reporting). No separate docs
 site or support service is declared. Do not publish local run state, result files or audit evidence
 containing private data along with the documentation.
 
-GitHub private vulnerability reporting is available for public repositories. While this repository
-is private, use the established private maintainer channel. If the owner explicitly makes it public,
-enable private vulnerability reporting immediately afterward and verify **Report a vulnerability**
-on the Security tab's Advisories page before announcing the repository. Follow
+Keep GitHub private vulnerability reporting enabled and verify **Report a vulnerability**
+on the Security tab's Advisories page. Follow
 [GitHub's setup instructions](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository).
 The reporting instructions in [SECURITY.md](../SECURITY.md#compatibility-and-reporting) describe
 the private route and the fallback for hosts without it; the document alone does not enable it.
@@ -81,7 +78,7 @@ snippet. See [title guidance](https://developers.google.com/search/docs/appearan
 
 This is a checklist for the future host, not a claim that any settings have been deployed:
 
-- Public pages must load without login and expose their main content and internal links to crawlers.
+- Public pages must load without login and display readable content and working internal links.
   Verify HTTP status, rendering, navigation and mobile readability on the actual host.
 - Give distinct pages their own preferred URLs. Use redirects for moved pages and align links,
   canonical annotations and the sitemap. A sitemap helps discovery but cannot guarantee indexing.
@@ -89,15 +86,6 @@ This is a checklist for the future host, not a claim that any settings have been
   [canonical guidance](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls)
   and
   [sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview).
-- Inspect robots rules, `noindex` and snippet/AI controls at deployment. A repository file only
-  governs crawling when served at the correct host location; a README cannot change a hosting
-  provider's robots policy. See
-  [robots.txt placement](https://developers.google.com/crawling/docs/robots-txt/create-robots-txt).
-- For ChatGPT search discovery, allow `OAI-SearchBot` and its published IP ranges through relevant
-  host/firewall controls. `GPTBot` controls a separate training use; allowing it is not a search
-  prerequisite. `ChatGPT-User` handles certain user-directed visits and is not the search crawler.
-  Consult the current [OpenAI crawler documentation](https://developers.openai.com/api/docs/bots)
-  when configuring the chosen host. Access permits discovery; it does not promise a citation.
 - Inspect the live property in Search Console. Record which intended pages are accessible and
   indexed, and fix actual rendering or access failures before adding more content.
 

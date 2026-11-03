@@ -1,56 +1,46 @@
-# GitHub repository setup
+# GitHub repository maintenance
 
-The repository is
+The public repository is
 [PolaronQuasi/codex-subagents-for-claude-code](https://github.com/PolaronQuasi/codex-subagents-for-claude-code),
 owned by **PolaronQuasi**, with clone URL
 `https://github.com/PolaronQuasi/codex-subagents-for-claude-code.git`.
-Repository metadata, CODEOWNERS, plugin ownership, installation commands and support links
-use this destination. No separate documentation host is declared.
+Use this checklist when maintaining repository settings, documentation or releases.
+For the release commands, see [Publishing a release](RELEASING.md).
 
-Private access requires GitHub authentication and repository permission. Anonymous HTTP404 does not
-establish that a private repository is missing. Public discoverability starts only after the owner
-makes it public and anonymous access is verified; editing metadata cannot grant public access.
+## Source and documentation
 
-## Before public publishing
-
-1. Verify authenticated access to the repository and check its remote refs before pushing.
-   Preserve existing remote work.
+1. Check remote refs before pushing and preserve existing remote work. Submit changes through
+   pull requests to `main`.
 2. Keep `package.json` repository/homepage/bugs URLs, `.claude-plugin/plugin.json` repository/homepage,
    README install commands and hosting metadata consistent with the destination above.
 3. Keep internal documentation links relative, including [examples](EXAMPLES.md),
    [support](../SUPPORT.md), [diagrams](diagrams/README.md) and the [comparison](COMPARISON.md).
    Check files, heading anchors and rendered navigation on the chosen host. Preserve the comparison's
    source revision and date until a new review is performed.
-4. If the owner explicitly decides to make the repository public, verify anonymous access after that
-   visibility change and before announcing it. Check HTTP success, indexable rendered content, crawler
-   access, redirects, canonical URLs, robots rules and indexing directives on the deployed host. Access
-   makes indexing possible, not guaranteed; see [Google's technical requirements](https://developers.google.com/search/docs/essentials/technical).
-5. If ChatGPT search discovery is wanted, configure `OAI-SearchBot` access separately from training
-   preferences for `GPTBot`. See [OpenAI's crawler documentation](https://developers.openai.com/api/docs/bots).
-6. After publication, record the actual source revision, deployed URLs and observed indexing results.
-   Do not claim that publication, search inclusion or live model compatibility follows from local checks.
-   The [publishing plan](PUBLISHING.md) covers documentation and discovery checks in more detail.
+4. Keep credentials, runtime state and local configuration out of source and releases. Preserve
+   executable modes on the commit and push hooks. Local checks do not establish live model compatibility.
 
 ## Repository settings
 
-Only the owner decides whether to make this private repository public. While it remains private,
-the maintainer should complete the applicable checks and establish a private reporting channel:
+Verify these settings in GitHub when repository permissions or workflows change:
 
-1. Confirm that `.github/CODEOWNERS` recognizes `@PolaronQuasi` with write access. The default
-   ownership rule is already present; check GitHub for ownership errors after the source is pushed.
-2. Establish the private maintainer reporting route described in [SECURITY.md](../SECURITY.md).
-   GitHub private vulnerability reporting is available for public repositories. If the owner explicitly
-   changes visibility to public, enable **Settings → Advanced Security → Private vulnerability reporting**
-   immediately afterward, then verify **Report a vulnerability** on the Security tab's Advisories page
-   before announcing the repository. Follow GitHub's
+1. Keep `.github/CODEOWNERS` valid for `@PolaronQuasi` and restrict repository write access.
+2. Keep private vulnerability reporting enabled and verify **Report a vulnerability** on the
+   Security tab's Advisories page. Keep Dependabot alerts, secret-scanning alerts and push protection
+   enabled. Reporting instructions are in [SECURITY.md](../SECURITY.md); see also GitHub's
    [private reporting instructions](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository).
-3. Protect `main` and version tags, restrict write access, and review Actions access, token
-   permissions and any private-repository billing before running hosted jobs. The workflows use ephemeral hosted runners. Never convert fork PR jobs
-   to privileged pull_request_target execution or a trusted persistent runner.
-4. Run the committed CI matrix on GitHub, including Windows and macOS. Local Linux execution
-   does not establish hosted OS validation or live model compatibility.
-5. Push only reviewed source and intended release tags. Keep credentials, runtime state and local
-   configuration out of the repository. Preserve executable modes on the commit and push hooks.
+3. Protect `main`: require pull requests, resolved review conversations, linear history and an
+   up-to-date branch with all six CI checks passing. Keep zero mandatory approvals for the sole
+   maintainer, block force pushes and deletion, allow squash merges only, and delete merged branches.
+4. Restrict creation of `v*` tags to repository admins. Separately block updates and deletion of
+   existing version tags, including by admins.
+5. Keep Actions permissions read-only by default, allow only the external actions used by the
+   workflows, require full commit-SHA pins, and require approval for outside contributors' fork
+   workflows. Use ephemeral hosted runners; never give fork PR jobs privileged
+   `pull_request_target` execution or a trusted persistent runner.
+6. Run the committed Node 22/24 matrix on Ubuntu, Windows and macOS. If job names change, update
+   the six required check names after verifying the replacement jobs. Local tests do not establish
+   successful hosted CI.
 
 ## Installation and workflow identity
 
@@ -58,17 +48,10 @@ A managed local installation creates its own receipt, bound to its exact source 
 Keep local receipts and published tags immutable; never copy a receipt from another source identity
 or installation.
 
-The package, archives, install and state folders, skill, output markers, runner image and runner
-label use the `codex-subagents-for-claude-code` namespace. Worktree branches use
-`csfcc/<20 hex characters>`; retired branches are preserved under `refs/csfcc/retired/`.
-Environment variables use `CODEX_SUBAGENTS_FOR_CLAUDE_CODE_`. Use the current names
-when configuring an installation; no compatibility aliases or automatic migration are provided.
-
 The active workflows are in `.github/workflows/`.
-Both GitHub jobs are restricted to GitHub.com, so a staging forge that also discovers that
-directory cannot run them with its own token or runners. CI covers Node 22/24 on Ubuntu,
-Windows and macOS; releases use the job's automatic `GITHUB_TOKEN`. No Docker runner, Gitea
-account or Gitea secret is needed on GitHub.
+Both workflows are restricted to GitHub.com, so a staging forge that also discovers that
+directory cannot run them with its own token or runners. Releases use the job's automatic
+`GITHUB_TOKEN`; no personal token or self-hosted runner is required.
 
 Optional self-hosted tooling is described in [Gitea hosting and releases](GITEA.md).
 
