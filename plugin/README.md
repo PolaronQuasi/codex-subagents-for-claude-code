@@ -1,6 +1,6 @@
 # Codex subagents for Claude Code
 
-Version 1.0.0. Requires Node.js 22+, Git, Claude Code and a logged-in compatible Codex CLI.
+Version 1.1.0. Requires Node.js 22+, Git, Claude Code and a logged-in compatible Codex CLI.
 
 Install from the repository marketplace in Claude Code:
 

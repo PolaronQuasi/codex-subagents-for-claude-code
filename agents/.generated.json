@@ -1,6 +1,8 @@
 {
   "version": 1,
   "files": {
+    "gpt-6-2-sol.md": "5dfe4ec7de4834dcd496f200c2f9b48f9adc9ef025f7a5c3d1db6582510a294c",
+    "gpt-6-2-astra.md": "93274fc6b7a2638895dcbca7502cd899bca6833e511e5431fdcb51fd00a8d681",
     "gpt-6-1-sol.md": "24fdb1adf724c843e4d42bea856b1680e72f2611385cd34e254e5bcf818eb651",
     "gpt-6-1-terra.md": "6c7516cc5859571e62daba45abec8dd9702e0c7aa53b4e6ed6df2138ab65e338",
     "gpt-6-astra.md": "4c2b20a6fe913dfe3ae52187236b1d3240f9f58bd2d2ff91b3557edaba442a4c",

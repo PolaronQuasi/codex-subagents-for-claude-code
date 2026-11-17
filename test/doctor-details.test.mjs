@@ -14,6 +14,8 @@ import {
 } from "../src/shared/runtime-release.mjs";
 import { fixture } from "./support/codex-fixture.mjs";
 
+const ROLE_COUNT = Object.keys(ROLES).length;
+
 function releaseCopy(f, { plugin = true, relative = "release" } = {}) {
   const root = path.join(f.root, relative);
   fs.mkdirSync(root, { recursive: true });
@@ -159,7 +161,7 @@ test("doctor reports the running plugin's definitions and manifest namespace, ne
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /^installation-mode=plugin$/m);
   assert.match(r.stdout, /^agent-namespace=alternate-name$/m);
-  assert.match(r.stdout, /^agents-available=8\/8$/m);
+  assert.match(r.stdout, new RegExp(`^agents-available=${ROLE_COUNT}/${ROLE_COUNT}$`, "m"));
   assert.match(r.stdout, /^agents-required=yes$/m);
   assert.match(r.stdout, /^claude-agents-loaded=unverified$/m);
   assert.ok(sameFolder(/^agents-dir=(.+)$/m.exec(r.stdout)?.[1], path.join(p.root, "agents")));
@@ -176,7 +178,10 @@ test("plugin missing, stale and unreadable definitions fail doctor; explicit age
   fs.mkdirSync(path.join(p.root, "agents", `${roles[2]}.md`));
   const broken = await p.invoke();
   assert.equal(broken.status, 1, broken.stdout + broken.stderr);
-  assert.match(broken.stdout, /^agents-available=5\/8$/m);
+  assert.match(
+    broken.stdout,
+    new RegExp(`^agents-available=${ROLE_COUNT - 3}/${ROLE_COUNT}$`, "m"),
+  );
   for (const [role, status] of [
     [roles[0], "missing"],
     [roles[1], "stale"],
@@ -193,7 +198,7 @@ test("plugin missing, stale and unreadable definitions fail doctor; explicit age
   assert.equal(overridden.status, 0, overridden.stdout + overridden.stderr);
   assert.match(overridden.stdout, /^installation-mode=agents-override$/m);
   assert.match(overridden.stdout, /^agent-namespace=none$/m);
-  assert.match(overridden.stdout, /^agents-available=0\/8$/m);
+  assert.match(overridden.stdout, new RegExp(`^agents-available=0/${ROLE_COUNT}$`, "m"));
   assert.match(overridden.stdout, /^agents-required=no$/m);
   assert.ok(overridden.stdout.includes(`agents-dir=${selected}`));
   const invalid = await p.invoke();
@@ -216,7 +221,7 @@ test("snapshot doctor retains captured plugin evidence after its source disappea
   assert.match(r.stdout, /^installation-mode=plugin-snapshot$/m);
   assert.match(r.stdout, /^agent-namespace=codex-subagents$/m);
   assert.match(r.stdout, /^agents-evidence=captured-at-prepare$/m);
-  assert.match(r.stdout, /^agents-available=8\/8$/m);
+  assert.match(r.stdout, new RegExp(`^agents-available=${ROLE_COUNT}/${ROLE_COUNT}$`, "m"));
   assert.match(r.stdout, /^claude-agents-loaded=unverified$/m);
   assert.match(r.stdout, /current plugin files and Claude loading are unverified/);
   const again = await p.invoke(["--prepare", "gpt-6-1-sol"], { entry });
@@ -241,7 +246,7 @@ test("standalone CLI forwarders are optional, while partial checkout installatio
   const partial = await p.invoke();
   assert.equal(partial.status, 1, partial.stdout + partial.stderr);
   assert.match(partial.stdout, /^installation-mode=checkout$/m);
-  assert.match(partial.stdout, /^agents-available=1\/8$/m);
+  assert.match(partial.stdout, new RegExp(`^agents-available=1/${ROLE_COUNT}$`, "m"));
   assert.match(partial.stdout, /^agents-required=yes$/m);
 });
 
@@ -263,7 +268,10 @@ test("snapshot definition inventories affect the digest and preserve captured fa
   const captured = await p.invoke(undefined, { entry: second.runner });
   assert.equal(captured.status, 1, captured.stdout + captured.stderr);
   assert.match(captured.stdout, /^installation-mode=plugin-snapshot$/m);
-  assert.match(captured.stdout, /^agents-available=7\/8$/m);
+  assert.match(
+    captured.stdout,
+    new RegExp(`^agents-available=${ROLE_COUNT - 1}/${ROLE_COUNT}$`, "m"),
+  );
   assert.ok(captured.stdout.includes(`problem=captured agent definition ${role}.md is missing`));
 });
 
@@ -300,9 +308,12 @@ test("dual-use source archives and checkouts distinguish installed forwarders fr
   const empty = await p.invoke();
   assert.equal(empty.status, 0, empty.stdout + empty.stderr);
   assert.match(empty.stdout, /^installation-mode=ambiguous$/m);
-  assert.match(empty.stdout, /^agents-available=0\/8$/m);
+  assert.match(empty.stdout, new RegExp(`^agents-available=0/${ROLE_COUNT}$`, "m"));
   assert.match(empty.stdout, /^agents-required=no$/m);
-  assert.match(empty.stdout, /^bundled-agents-available=8\/8$/m);
+  assert.match(
+    empty.stdout,
+    new RegExp(`^bundled-agents-available=${ROLE_COUNT}/${ROLE_COUNT}$`, "m"),
+  );
   assert.match(empty.stdout, /^bundled-agent-namespace=codex-subagents$/m);
   assert.match(empty.stdout, /^claude-agents-loaded=unverified$/m);
   assert.equal(fs.existsSync(path.join(p.root, ".git")), false);
@@ -319,8 +330,11 @@ test("dual-use source archives and checkouts distinguish installed forwarders fr
   assert.equal(installed.status, 0, installed.stdout + installed.stderr);
   assert.match(installed.stdout, /^installation-mode=ambiguous$/m);
   assert.match(installed.stdout, /^agent-namespace=none$/m);
-  assert.match(installed.stdout, /^agents-available=8\/8$/m);
-  assert.match(installed.stdout, /^bundled-agents-available=7\/8$/m);
+  assert.match(installed.stdout, new RegExp(`^agents-available=${ROLE_COUNT}/${ROLE_COUNT}$`, "m"));
+  assert.match(
+    installed.stdout,
+    new RegExp(`^bundled-agents-available=${ROLE_COUNT - 1}/${ROLE_COUNT}$`, "m"),
+  );
   assert.ok(installed.stdout.includes(`agents-dir=${agents}`));
 
   // A local --plugin-dir invocation can bind its hint to the exact loaded root.
@@ -328,7 +342,10 @@ test("dual-use source archives and checkouts distinguish installed forwarders fr
   assert.equal(plugin.status, 1, plugin.stdout + plugin.stderr);
   assert.match(plugin.stdout, /^installation-mode=plugin$/m);
   assert.match(plugin.stdout, /^agent-namespace=codex-subagents$/m);
-  assert.match(plugin.stdout, /^agents-available=7\/8$/m);
+  assert.match(
+    plugin.stdout,
+    new RegExp(`^agents-available=${ROLE_COUNT - 1}/${ROLE_COUNT}$`, "m"),
+  );
   assert.match(plugin.stdout, /^agents-required=yes$/m);
   assert.ok(plugin.stdout.includes(`problem=agent definition ${role}.md is missing`));
 });
@@ -367,8 +384,8 @@ test("snapshot inventories preserve ambiguous versus explicitly selected plugin 
   const r = await p.invoke(undefined, { entry: ambiguous.runner });
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /^installation-mode=ambiguous$/m);
-  assert.match(r.stdout, /^agents-available=0\/8$/m);
-  assert.match(r.stdout, /^bundled-agents-available=8\/8$/m);
+  assert.match(r.stdout, new RegExp(`^agents-available=0/${ROLE_COUNT}$`, "m"));
+  assert.match(r.stdout, new RegExp(`^bundled-agents-available=${ROLE_COUNT}/${ROLE_COUNT}$`, "m"));
   assert.match(r.stdout, /^bundled-agents-evidence=captured-at-prepare$/m);
   assert.equal(
     ensureRuntime({ ...args, root: ambiguous.dir, entry: ambiguous.runner }).id,

@@ -2,12 +2,12 @@
   "schema": 1,
   "generatedBy": "tools/plugin-package.mjs",
   "source": "./plugin",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "files": [
     {
       "path": ".claude-plugin/plugin.json",
       "size": 791,
-      "sha256": "fa3da017bd4544d0bf52f2ca091c844868f3126243838ed8e01cdf70efaf53ed"
+      "sha256": "b1802467400ca5a3465209bd3b0a3968d1dfbac87d39b60be38cfc4c6984b1a8"
     },
     {
       "path": "CONTRACT.md",
@@ -27,7 +27,7 @@
     {
       "path": "README.md",
       "size": 1304,
-      "sha256": "2f7857ce1dec5bec499501ddf08c5959a6d68c1bd3ca43cf772ecef2017d699d"
+      "sha256": "a86ae1cd17e54de7cf82f7c4d60a25de6c553b0700a58710985239cddd00ca8c"
     },
     {
       "path": "SECURITY.md",
@@ -63,6 +63,16 @@
       "path": "agents/gpt-6-1-terra.md",
       "size": 4933,
       "sha256": "6c7516cc5859571e62daba45abec8dd9702e0c7aa53b4e6ed6df2138ab65e338"
+    },
+    {
+      "path": "agents/gpt-6-2-astra.md",
+      "size": 4933,
+      "sha256": "93274fc6b7a2638895dcbca7502cd899bca6833e511e5431fdcb51fd00a8d681"
+    },
+    {
+      "path": "agents/gpt-6-2-sol.md",
+      "size": 4919,
+      "sha256": "5dfe4ec7de4834dcd496f200c2f9b48f9adc9ef025f7a5c3d1db6582510a294c"
     },
     {
       "path": "agents/gpt-6-astra.md",
@@ -126,8 +136,8 @@
     },
     {
       "path": "skills/codex-subagents-for-claude-code/SKILL.md",
-      "size": 24910,
-      "sha256": "0d3fd13d5d9c3f1f5ebba0f2e8267008ddc699834cefb0b4b3118e9baef86587"
+      "size": 24942,
+      "sha256": "e246f478648def45214587cdae387cf85829c26976bc770e2948d2985dea29e1"
     },
     {
       "path": "src/cli/options.mjs",
@@ -306,8 +316,8 @@
     },
     {
       "path": "src/roles.mjs",
-      "size": 1592,
-      "sha256": "072224342d4592a1926ad940190c231f0ea5386e8d38c676e404baba83db8d0b"
+      "size": 1850,
+      "sha256": "9a49b88a05d124215e776393f1b7b265fc66b1cccba7693a51848ee3745060ea"
     },
     {
       "path": "src/run/cancel.mjs",
@@ -567,7 +577,7 @@
     {
       "path": "src/version.mjs",
       "size": 186,
-      "sha256": "7860c7b8d7ffd9f5099de67f6d98619bd84dc9de965bae2a430c80a1b785f9ca"
+      "sha256": "f6e533cead5f2c7a95eca08235e6750d2f1f956464d32644b06be59d4fe67452"
     }
   ]
 }

@@ -17,8 +17,9 @@ this conversation.
 Run it with `node {{runnerarg}}`. Use `--help` for the options and `{{manual}}` for the full
 reference.
 
-{{prepare}}There is one role per model: `gpt-6-1-sol`, `gpt-6-1-terra`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`,
-`gpt-5-6-sol`, `gpt-5-6-terra` and `gpt-5-6-luna`. Every role defaults to `xhigh` unless the task
+{{prepare}}There is one role per model: `gpt-6-2-sol`, `gpt-6-2-astra`, `gpt-6-1-sol`, `gpt-6-1-terra`,
+`gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`, `gpt-5-6-sol`, `gpt-5-6-terra` and `gpt-5-6-luna`.
+Every role defaults to `xhigh` unless the task
 requests another effort.
 
 ## Effort: choose it per task

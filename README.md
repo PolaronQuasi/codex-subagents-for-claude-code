@@ -4,7 +4,7 @@ Independent project; not affiliated with or endorsed by OpenAI or Anthropic.
 Source: [PolaronQuasi/codex-subagents-for-claude-code](https://github.com/PolaronQuasi/codex-subagents-for-claude-code).
 
 Delegate self-contained tasks from Claude Code to GPT models through the installed Codex CLI.
-`run-codex-task.mjs` (runner 1.0.0) starts our own driver and a dedicated Codex app-server for each turn.
+`run-codex-task.mjs` (runner 1.1.0) starts our own driver and a dedicated Codex app-server for each turn.
 The driver saves the answer and exits. Kept conversations resume the same persisted native Codex thread
 in a fresh process for the next turn. [Session persistence and prompt caching](docs/COMPARISON.md#native-threads-and-prompt-caching)
 are separate: neither a retained thread nor a running process guarantees cache reuse.
@@ -167,6 +167,8 @@ the default inherits the user's Codex configuration. It retains the native login
 
 | Role            | Exact model     | Default effort |
 | --------------- | --------------- | -------------- |
+| `gpt-6-2-sol`   | `gpt-6.2-sol`   | `xhigh`        |
+| `gpt-6-2-astra` | `gpt-6.2-astra` | `xhigh`        |
 | `gpt-6-1-sol`   | `gpt-6.1-sol`   | `xhigh`        |
 | `gpt-6-1-terra` | `gpt-6.1-terra` | `xhigh`        |
 | `gpt-6-astra`   | `gpt-6-astra`   | `xhigh`        |
@@ -175,6 +177,9 @@ the default inherits the user's Codex configuration. It retains the native login
 | `gpt-5-6-sol`   | `gpt-5.6-sol`   | `xhigh`        |
 | `gpt-5-6-terra` | `gpt-5.6-terra` | `xhigh`        |
 | `gpt-5-6-luna`  | `gpt-5.6-luna`  | `xhigh`        |
+
+The 2026-11-17 catalogue observed with codex-cli 0.166.0 lists GPT-6.2-Sol and GPT-6.2-Astra
+with `low`, `medium`, `high`, `xhigh`, `max` and `ultra` efforts. Their runner defaults remain `xhigh`.
 
 Effort is passed literally: `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`, `ultra`.
 `ultra`, above `max`, is only ever an explicit choice. The catalogue check can refuse an unsupported

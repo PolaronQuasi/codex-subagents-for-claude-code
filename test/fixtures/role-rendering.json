@@ -1,5 +1,13 @@
 {
   "ROLES": {
+    "gpt-6-2-sol": {
+      "model": "gpt-6.2-sol",
+      "effort": "xhigh"
+    },
+    "gpt-6-2-astra": {
+      "model": "gpt-6.2-astra",
+      "effort": "xhigh"
+    },
     "gpt-6-1-sol": {
       "model": "gpt-6.1-sol",
       "effort": "xhigh"
@@ -34,6 +42,14 @@
     }
   },
   "DISPLAY": {
+    "gpt-6-2-sol": {
+      "model": "GPT-6.2-Sol",
+      "alias": "(\"6.2 sol\")"
+    },
+    "gpt-6-2-astra": {
+      "model": "GPT-6.2-Astra",
+      "alias": "(\"6.2 astra\")"
+    },
     "gpt-6-1-sol": {
       "model": "GPT-6.1-Sol",
       "alias": "(\"6.1 sol\")"
@@ -73,6 +89,8 @@
     "tmp": "T"
   },
   "sha256": {
+    "gpt-6-2-sol.md": "0a1dc59cdc898ce8c40b14208e1d35b38b87c4713ffe23751ad8a878c87536ad",
+    "gpt-6-2-astra.md": "1a769a4a7eebbf645c59d6c39cde0f77f0a1d51cd3e9ced27db994268da5c483",
     "gpt-6-1-sol.md": "b4578a0b419460e0bcf2a83ef6e7bdfff658865986361fe89a7c842c1fcd8180",
     "gpt-6-1-terra.md": "8dbe6f2e9ecc05de3cc09f611b11b90bbdc1abd23dfe0163fcae1e7d27fbacc1",
     "gpt-6-astra.md": "8286b604b94e71097f0774e487569ff9f9673db9b54b84e293dc494051876777",
@@ -81,6 +99,6 @@
     "gpt-5-6-sol.md": "33cf52f63f4775930d7ccbaf6aeb8687e47e3ca8072dcb8b66bce5cc214b53fd",
     "gpt-5-6-terra.md": "1ecd14e220c3a658440346fbe6c261dd54f8e2f65ea418665c299098fbd30381",
     "gpt-5-6-luna.md": "6f9ca54da814e529c9a686c2b97ab55652276681eabeb606596c1e5109239267",
-    "SKILL.md": "7cc2354ac29a299f1f8d7ec7d7dea1a402d9aa8ea76a447ff9310d26c4f2911b"
+    "SKILL.md": "799f8abe22f54564d8e63e99d1fb58c951805666fe6e1d8ac8d2cc6308e32b1f"
   }
 }
