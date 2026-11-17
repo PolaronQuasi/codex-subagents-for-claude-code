@@ -23,8 +23,9 @@ runner, kept outside the plugin cache, which the command makes when it is missin
 `task-file:` line names an unused task file in the temporary folder; run it again for each new
 task file.
 
-There is one role per model: `gpt-6-1-sol`, `gpt-6-1-terra`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`,
-`gpt-5-6-sol`, `gpt-5-6-terra` and `gpt-5-6-luna`. Every role defaults to `xhigh` unless the task
+There is one role per model: `gpt-6-2-sol`, `gpt-6-2-astra`, `gpt-6-1-sol`, `gpt-6-1-terra`,
+`gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`, `gpt-5-6-sol`, `gpt-5-6-terra` and `gpt-5-6-luna`.
+Every role defaults to `xhigh` unless the task
 requests another effort.
 
 ## Effort: choose it per task

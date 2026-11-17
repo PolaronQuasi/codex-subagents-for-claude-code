@@ -101,7 +101,7 @@ test("doctor read-only skips every write probe and leaves missing directories ab
   }
   assert.equal(report.code, 0, report.stdout + report.stderr);
   assert.match(report.stdout, /^installation-mode=agents-override$/m);
-  assert.match(report.stdout, /^agents-available=0\/8$/m);
+  assert.match(report.stdout, new RegExp(`^agents-available=0/${Object.keys(ROLES).length}$`, "m"));
   assert.match(report.stdout, /^agents-required=no$/m);
   assert.match(report.stdout, /^claude-agents-loaded=unverified$/m);
   assert.match(report.stdout, /^state-writable=not-tested$/m);

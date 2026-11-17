@@ -1,6 +1,18 @@
 // One role catalogue supplies runtime defaults and forwarder display metadata.
 // Keep the existing ROLES and DISPLAY shapes: callers do not see catalogue-only fields.
 const CATALOGUE = {
+  "gpt-6-2-sol": {
+    model: "gpt-6.2-sol",
+    effort: "xhigh",
+    display: "GPT-6.2-Sol",
+    alias: '("6.2 sol")',
+  },
+  "gpt-6-2-astra": {
+    model: "gpt-6.2-astra",
+    effort: "xhigh",
+    display: "GPT-6.2-Astra",
+    alias: '("6.2 astra")',
+  },
   "gpt-6-1-sol": {
     model: "gpt-6.1-sol",
     effort: "xhigh",
